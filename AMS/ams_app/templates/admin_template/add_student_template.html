@@ -1,0 +1,100 @@
+{% extends 'admin_template/base_template.html' %}
+
+{% block page_title %}
+{% endblock page_title %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-lg border-0 rounded">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title">Enroll Student</h3>
+                    </div>
+                    <form role="form" action="/add_student_save" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            {{ form.as_p }}
+                            <div class="form-group">
+                                <label class="font-weight-bold">Select Courses</label>
+                                <select id="course-select" name="courses" multiple="multiple" class="form-control">
+                                    {% for course in form.fields.course.choices %}
+                                        <option value="{{ course.0 }}">{{ course.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="font-weight-bold">Select Subjects</label>
+                                <select id="subject-select" name="subjects" multiple class="form-control">
+                                </select>
+                            </div>
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }} mt-2">{{ message }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary btn-block">Enroll Student</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    $('#course-select').select2({
+        placeholder: "Search and select courses",
+        width: '100%'
+    });
+
+    $('#subject-select').select2({
+        placeholder: "Subjects will appear here",
+        width: '100%'
+    });
+
+    $('#course-select').on('change', function () {
+        const selectedCourses = $(this).val();
+        const subjectSelect = $('#subject-select');
+        subjectSelect.empty();
+
+        if (selectedCourses && selectedCourses.length > 0) {
+            fetch(`/get_subjects_by_course/?courses=${selectedCourses.join(",")}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.subjects.length > 0) {
+                        data.subjects.forEach(subject => {
+                            const newOption = new Option(subject.subject_name, subject.id, false, false);
+                            subjectSelect.append(newOption);
+                        });
+                        subjectSelect.trigger('change');
+                    } else {
+                        const placeholder = new Option("No subjects found", "", false, false);
+                        subjectSelect.append(placeholder);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading subjects:", error);
+                    const errorOption = new Option("Error loading subjects", "", false, false);
+                    subjectSelect.append(errorOption);
+                });
+        } else {
+            const defaultOption = new Option("Select a course to load subjects", "", false, false);
+            subjectSelect.append(defaultOption);
+        }
+    });
+});
+</script>
+
+<style>
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #007bff;
+        color: white;
+        border-radius: 5px;
+    }
+</style>
+{% endblock main_content %}

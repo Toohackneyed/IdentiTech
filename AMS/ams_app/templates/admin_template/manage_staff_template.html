@@ -1,0 +1,144 @@
+{% extends 'admin_template/base_template.html' %}
+
+{% block page_title %}
+Manage Staff
+{% endblock page_title %}
+
+{% block main_content %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card shadow-lg border-0 rounded-4">
+          <div class="card-header bg-primary text-white d-flex flex-wrap justify-content-between align-items-center rounded-top-4 px-4 py-3">
+            <a href="{% url 'add_staff' %}" class="btn btn-success btn-sm rounded-pill px-4">+ Add Staff</a>
+            <div class="input-group input-group-sm w-auto">
+              <input type="text" id="table_search" class="form-control rounded-start-pill" placeholder="Search staff..." onkeyup="searchTable()">
+              <button type="button" class="btn btn-light rounded-end-pill"><i class="fas fa-search"></i></button>
+            </div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover table-striped text-nowrap mb-0">
+                <thead class="bg-dark text-white sticky-top">
+                  <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Profile</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for staff in staffs %}
+                  <tr>
+                    <td>{{ staff.admin.first_name }}</td>
+                    <td>{{ staff.admin.last_name }}</td>
+                    <td>{{ staff.admin.username }}</td>
+                    <td>{{ staff.admin.email }}</td>
+                    <td>
+                      {% if staff.profile_pic %}
+                        <img src="{{ staff.profile_pic.url }}" alt="Profile" class="img-fluid rounded-circle" width="50" height="50">
+                      {% else %}
+                        <span class="text-muted">N/A</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <a href="{% url 'edit_staff' staff_id=staff.admin.id %}" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                        <i class="fas fa-edit"></i> Edit
+                      </a>
+                      <button 
+                        class="btn btn-sm btn-outline-danger rounded-pill px-3" 
+                        onclick="openDeleteModal({{ staff.admin.id }}, '{{ staff.admin.first_name }}', '{{ staff.admin.last_name }}')">
+                        <i class="fas fa-trash"></i> Delete
+                      </button>
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="7" class="text-center text-muted py-4">No staff found.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                      <h5 class="modal-title">Confirm Deletion</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      Are you sure you want to delete <strong id="staffName"></strong>? This action cannot be undone.
+                    </div>
+                    <div class="modal-footer">
+                      <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Yes, Delete</a>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function openDeleteModal(staffId, firstName, lastName) {
+    document.getElementById('staffName').textContent = `${firstName} ${lastName}`;
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    confirmBtn.href = `{% url 'delete_staff' staff_id=0 %}`.replace('0', staffId);
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    deleteModal.show();
+  }
+
+  function searchTable() {
+    let input = document.getElementById("table_search").value.toLowerCase();
+    let rows = document.querySelectorAll("tbody tr");
+    rows.forEach(row => {
+      let text = row.innerText.toLowerCase();
+      row.style.display = text.includes(input) ? "" : "none";
+    });
+  }
+</script>
+
+<style>
+  .table th, .table td {
+    vertical-align: middle;
+    text-align: center;
+    padding: 0.75rem;
+  }
+  .table tbody tr:hover {
+    background-color: #f1f1f1;
+    transition: background-color 0.2s ease;
+  }
+  .card {
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .input-group input {
+    border-radius: 2rem 0 0 2rem;
+  }
+  .input-group button {
+    border-radius: 0 2rem 2rem 0;
+  }
+  @media (max-width: 768px) {
+    .card-header {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .input-group {
+      width: 100% !important;
+    }
+  }
+</style>
+{% endblock main_content %}

@@ -1,0 +1,57 @@
+{% load static %}
+<aside class="main-sidebar sidebar-dark-primary elevation-4" style="background: linear-gradient(135deg, #0a0f2c, #1b2a49); box-shadow: 4px 4px 10px rgba(0, 212, 255, 0.2);">
+    <a href="{% url 'about_page' %}" class="brand-link">
+        <img src="{% static 'dist/img/Logo.png' %}" alt="IdentiTech Logo" class="brand-image elevation-3" style="opacity: .9">
+        <span class="brand-text font-weight-light" style="color: #00d4ff; text-shadow: 0 0 10px #00d4ff;">IdentiTech</span>
+    </a>
+
+    <div class="sidebar">
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <img src="https://img.freepik.com/premium-vector/user-icon-icon_1076610-59410.jpg?w=360"  class="img-circle elevation-2" alt="User Image">
+        </div>
+        <div class="info">
+          <a href="{% url 'student_profile' %}" class="d-block">{{ user.username }}</a>
+        </div>
+      </div>
+
+      <div class="form-inline">
+        <div class="input-group" data-widget="sidebar-search">
+          <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+          <div class="input-group-append">
+            <button class="btn btn-sidebar">
+              <i class="fas fa-search fa-fw"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          
+          <li class="nav-item">
+            {% url 'student_home' as student_home %}
+            <a href="{% url 'student_home' %}" class="nav-link {% if request.path == student_home %} active {% endif %}">
+              <i class="nav-icon fas fa-home"></i>
+              <p>Home</p>
+            </a>
+          </li> 
+
+          <li class="nav-item">
+            {% url 'student_view_attendance' as student_view_attendance %}
+            <a href="{% url 'student_view_attendance' %}" class="nav-link {% if request.path == student_view_attendance %} active {% endif %}">
+              <i class="nav-icon fas fa-clipboard-list"></i>
+              <p>View Attendance</p>
+            </a>
+          </li>      
+          <li class="nav-item">
+            {% url 'student_my_subjects' as student_my_subjects %}
+            <a href="{{ student_my_subjects }}" class="nav-link {% if request.path == student_my_subjects %}active{% endif %}">
+              <i class="nav-icon fas fa-book-open"></i>
+              <p>My Subjects</p>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
